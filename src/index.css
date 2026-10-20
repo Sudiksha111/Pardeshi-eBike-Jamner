@@ -1,0 +1,210 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================
+   🌗 GLOBAL BASE (FULL SCREEN + SMOOTH THEME)
+   ========================================================= */
+
+@layer base {
+  html,
+  body,
+  #root {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    @apply bg-background text-foreground transition-colors duration-300;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  * {
+    @apply border-border;
+  }
+}
+
+/* =========================================================
+   🌞 LIGHT MODE (DEFAULT)
+   ========================================================= */
+
+@layer base {
+  :root {
+    /* Core colors */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 98%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 98%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 65 100% 50%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 142 76% 36%;
+
+    --radius: 0.75rem;
+
+    /* Custom Eco Theme */
+    --eco-green: 142 76% 36%;
+    --eco-green-light: 142 76% 46%;
+    --neon-green: 120 100% 50%;
+    --neon-yellow: 65 100% 50%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(var(--eco-green)),
+      hsl(var(--eco-green-light))
+    );
+
+    --gradient-hero: linear-gradient(
+      135deg,
+      hsl(var(--background)),
+      hsl(210 40% 96%)
+    );
+
+    /* Shadows */
+    --shadow-glow: 0 0 25px hsl(142 76% 36% / 0.25);
+    --shadow-soft: 0 10px 30px -10px hsl(0 0% 0% / 0.15);
+
+    /* Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* =========================================================
+   🌙 DARK MODE
+   (activated via <html class="dark">)
+   ========================================================= */
+
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+
+  --card: 222.2 84% 6%;
+  --card-foreground: 210 40% 98%;
+
+  --popover: 222.2 84% 6%;
+  --popover-foreground: 210 40% 98%;
+
+  --primary: 142 76% 46%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+
+  --accent: 65 100% 50%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 142 76% 46%;
+
+  --gradient-hero: linear-gradient(
+    135deg,
+    hsl(var(--background)),
+    hsl(217.2 32.6% 17.5%)
+  );
+
+  --shadow-glow: 0 0 30px hsl(142 76% 46% / 0.35);
+}
+
+/* =========================================================
+   🧩 UTILITIES
+   ========================================================= */
+
+@layer utilities {
+  .bg-gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .bg-gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .card {
+    @apply bg-card text-card-foreground rounded-xl;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+}
+
+/* =========================================================
+   🎬 ANIMATIONS
+   ========================================================= */
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-16px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
