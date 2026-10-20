@@ -1,121 +1,170 @@
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Zap, Sun, Moon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Menu, X, Zap, Sun, Moon, ArrowUpRight } from "lucide-react";
 
 interface NavbarProps {
   theme: "light" | "dark";
-  setTheme: React.Dispatch<React.SetStateAction<"light" | "dark">>;
+  setTheme: () => void;
 }
+
+const navItems = [
+  { name: "Home", path: "/" },
+  { name: "Brands", path: "/brands" },
+  { name: "Contact", path: "/contact" },
+  { name: "Login", path: "/login" },
+];
 
 const Navbar = ({ theme, setTheme }: NavbarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
-  const navItems = [
-    { name: "Home", path: "/" },
-    { name: "Brands", path: "/brands" },
-    { name: "Contact", path: "/contact" },
-    { name: "Login", path: "/login" },
-  ];
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
 
-  const isActive = (path: string) => location.pathname === path;
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsOpen(false);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
+  const isActive = (path: string) =>
+    path === "/"
+      ? location.pathname === "/"
+      : location.pathname === path ||
+        (path === "/brands" &&
+          location.pathname.startsWith("/brands/"));
+
+  const themeButton = (
+    <button
+      type="button"
+      onClick={setTheme}
+      aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+      title="Toggle color theme"
+      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-background/80 text-foreground transition-all duration-200 hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+    >
+      {theme === "light" ? (
+        <Moon className="h-5 w-5" aria-hidden="true" />
+      ) : (
+        <Sun className="h-5 w-5" aria-hidden="true" />
+      )}
+    </button>
+  );
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <nav
+      aria-label="Main navigation"
+      className="fixed inset-x-0 top-0 z-50 border-b border-border/60 bg-background/85 shadow-sm backdrop-blur-xl"
+    >
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:h-[76px] lg:px-8">
+        {/* Logo */}
+        <Link
+          to="/"
+          onClick={() => setIsOpen(false)}
+          className="group flex min-w-0 items-center gap-2.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          aria-label="Pardeshi eBike home"
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-primary shadow-sm transition-transform duration-200 group-hover:scale-105">
+            <Zap className="h-6 w-6 text-white" aria-hidden="true" />
+          </span>
 
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 text-xl font-bold text-primary">
-            <Zap className="w-8 h-8 text-neon-green" />
-            <p>Pardeshi eBike</p>
-          </Link>
+          <span className="truncate text-base font-extrabold tracking-tight text-foreground sm:text-lg lg:text-xl">
+            Pardeshi <span className="text-primary">eBike</span>
+          </span>
+        </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
-            {navItems.map((item) => (
+        {/* Desktop navigation */}
+        <div className="hidden items-center gap-1 md:flex lg:gap-2">
+          {navItems.map((item) => {
+            const active = isActive(item.path);
+
+            return (
               <Link
-                key={item.name}
+                key={item.path}
                 to={item.path}
-                className={`nav-link px-3 py-2 text-sm font-medium transition-smooth ${
-                  isActive(item.path)
-                    ? "text-primary active"
-                    : "text-foreground hover:text-primary"
+                aria-current={active ? "page" : undefined}
+                className={`relative rounded-full px-3 py-2.5 text-sm font-semibold transition-colors duration-200 lg:px-4 ${
+                  active
+                    ? "bg-primary/10 text-primary"
+                    : "text-foreground/75 hover:bg-muted hover:text-primary"
                 }`}
               >
                 {item.name}
               </Link>
-            ))}
+            );
+          })}
 
-            {/* 🌗 Dark Mode Button */}
-            <button
-              onClick={() => setTheme(prev => (prev === "light" ? "dark" : "light"))}
-              className="
-                h-10 w-10
-                flex items-center justify-center
-                rounded-full
-                bg-white/80 text-gray-800
-                dark:bg-gray-900/80 dark:text-gray-100
-                backdrop-blur-md
-                shadow-md
-                hover:scale-105 hover:shadow-lg
-                transition-all duration-300
-              "
-              aria-label="Toggle theme"
-            >
-              {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-            </button>
-          </div>
-
-          {/* Mobile */}
-          <div className="md:hidden flex items-center space-x-2">
-            <button
-              onClick={() => setTheme(prev => (prev === "light" ? "dark" : "light"))}
-              className="
-                h-10 w-10
-                flex items-center justify-center
-                rounded-full
-                bg-white/80 text-gray-800
-                dark:bg-gray-900/80 dark:text-gray-100
-                backdrop-blur-md
-                shadow-md
-                transition-all
-              "
-            >
-              {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-            </button>
-
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-foreground hover:text-primary p-2"
-            >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
+          {themeButton}
         </div>
 
-        {/* Mobile Menu */}
-        {isOpen && (
-          <div className="md:hidden absolute top-16 left-0 right-0 glass rounded-b-lg">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              {navItems.map((item) => (
+        {/* Mobile controls */}
+        <div className="flex shrink-0 items-center gap-2 md:hidden">
+          {themeButton}
+
+          <button
+            type="button"
+            onClick={() => setIsOpen((open) => !open)}
+            aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isOpen}
+            aria-controls="mobile-navigation"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            {isOpen ? (
+              <X className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <Menu className="h-5 w-5" aria-hidden="true" />
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      <div
+        id="mobile-navigation"
+        aria-label="Mobile navigation"
+        aria-hidden={!isOpen}
+        className={`grid overflow-hidden border-t border-border/60 bg-background/95 backdrop-blur-xl transition-[grid-template-rows,opacity] duration-200 md:hidden ${
+          isOpen
+            ? "visible grid-rows-[1fr] opacity-100"
+            : "invisible grid-rows-[0fr] opacity-0"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="mx-auto max-w-7xl space-y-1 px-4 py-3 sm:px-6">
+            {navItems.map((item) => {
+              const active = isActive(item.path);
+
+              return (
                 <Link
-                  key={item.name}
+                  key={item.path}
                   to={item.path}
+                  tabIndex={isOpen ? 0 : -1}
+                  aria-current={active ? "page" : undefined}
                   onClick={() => setIsOpen(false)}
-                  className={`block px-3 py-2 rounded-md ${
-                    isActive(item.path)
-                      ? "text-primary bg-muted"
-                      : "text-foreground hover:text-primary hover:bg-muted"
+                  className={`flex min-h-12 items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition-colors ${
+                    active
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground hover:bg-muted"
                   }`}
                 >
                   {item.name}
+                  {active && (
+                    <ArrowUpRight
+                      className="h-4 w-4"
+                      aria-hidden="true"
+                    />
+                  )}
                 </Link>
-              ))}
-            </div>
+              );
+            })}
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );
