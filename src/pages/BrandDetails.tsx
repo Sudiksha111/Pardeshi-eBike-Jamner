@@ -142,7 +142,7 @@ const BrandDetails = () => {
             {brand.bikes.map((bike: any, index: number) => (
               <div
                 key={bike.id}
-                className="bike-card cursor-pointer animate-slide-up"
+                className="cursor-pointer rounded-3xl border border-border/60 bg-card p-5 text-card-foreground shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl animate-slide-up"
                 style={{ animationDelay: `${index * 0.1}s` }}
                 onClick={() => setSelectedBike(bike)}
               >
@@ -191,7 +191,7 @@ const BrandDetails = () => {
                   </div>
 
                   {/* Price */}
-                  <div className="flex items-center justify-between pt-4 border-t border-glass-border">
+                  <div className="flex items-center justify-between pt-4 border-t border-border">
                     <span className="text-2xl font-bold text-foreground">{bike.price}</span>
                     <Button className={`bg-gradient-to-r ${brand.color} hover:shadow-lg hover-scale text-white border-0`}>
                       View Details
@@ -206,7 +206,7 @@ const BrandDetails = () => {
 
       {/* Bike Detail Modal */}
       <Dialog open={!!selectedBike} onOpenChange={() => setSelectedBike(null)}>
-        <DialogContent className="max-w-4xl glass">
+        <DialogContent className="max-w-4xl border-border bg-background text-foreground sm:rounded-2xl">
           {selectedBike && (
             <>
               <DialogHeader>
@@ -238,7 +238,7 @@ const BrandDetails = () => {
                   </div>
 
                   <Tabs defaultValue="specs" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 glass">
+                    <TabsList className="grid w-full grid-cols-2 bg-muted">
                       <TabsTrigger value="specs">Specifications</TabsTrigger>
                       <TabsTrigger value="features">Features</TabsTrigger>
                     </TabsList>

@@ -1,341 +1,769 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { motion, type Variants } from "framer-motion";
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
-import { 
-  Zap, 
-  Battery, 
-  Gauge, 
-  Shield, 
-  Play, 
-  PlayIcon, 
-  PauseIcon, 
-  ChevronLeftIcon, 
-  ChevronRightIcon 
+import {
+  ArrowDownRight,
+  ArrowRight,
+  BatteryCharging,
+  Check,
+  ChevronRight,
+  Gauge,
+  Leaf,
+  ShieldCheck,
 } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
-// Assets
-import Ola from "@/assets/ola.jpg";
+import heroImage from "@/assets/hero-ebike.jpg";
+import olaGen3 from "@/assets/ola_s1pro_gen3_web_image_v2.webp";
+import olaS1Pro from "@/assets/ola_s1_pro.png";
+import olaS1Air from "@/assets/ola s1 air.png";
+import roadstar from "@/assets/roadstar.webp";
+import pe1 from "@/assets/pe1.webp";
+import seeka from "@/assets/seeka.png";
+import segun from "@/assets/segun.webp";
 import heroVideo from "@/assets/hero-bg.mp4";
-import pic1 from "@/assets/models/pic1.jpg";
-import pic2 from "@/assets/models/pic2.jpg";
-import pic3 from "@/assets/models/pic3.jpg";
-import pic4 from "@/assets/models/pic4.jpg";
-import pic6 from "@/assets/models/pic6.jpg";
 
-const slides = [
-  { id: 1, image: pic1, title: "Mountain Serenity", description: "Breathtaking alpine landscapes" },
-  { id: 2, image: pic2, title: "Neon Dreams", description: "Futuristic cityscapes" },
-  { id: 3, image: pic3, title: "Cosmic Wonder", description: "Ethereal galaxy views" },
-  { id: 4, image: pic4, title: "Lavender Fields", description: "Romantic Provence sunset" },
-  { id: 4, image: pic6, title: "Lavender Fields", description: "Romantic Provence sunset" },
-];
+/* -------------------------------------------------------
+   ANIMATION VARIANTS
+------------------------------------------------------- */
 
-// --- Slideshow Component ---
-export const Slideshow = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [progress, setProgress] = useState(0);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-    setProgress(0);
-  }, []);
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-    setProgress(0);
-  };
-
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-    setProgress(0);
-  };
-
-  useEffect(() => {
-    if (!isPlaying) return;
-    intervalRef.current = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          nextSlide();
-          return 0;
-        }
-        return prev + 1;
-      });
-    }, 50); 
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [isPlaying, nextSlide]);
-
-  return (
-    <div className="relative w-full bg-background py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Main Image Container */}
-        <div className="relative aspect-[21/9] w-full overflow-hidden rounded-3xl shadow-2xl bg-black">
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={currentSlide}
-              src={slides[currentSlide].image}
-              alt={slides[currentSlide].title}
-              initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.8, ease: "easeInOut" }}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          </AnimatePresence>
-
-          {/* Overlays */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent z-10" />
-          
-          <div className="absolute bottom-8 left-8 md:bottom-12 md:left-12 z-20 max-w-2xl">
-            <motion.div
-              key={`text-${currentSlide}`}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <h2 className="text-3xl md:text-6xl font-bold text-white mb-2 italic tracking-tight">
-                {slides[currentSlide].title}
-              </h2>
-              <p className="text-lg md:text-xl text-gray-300 font-light">
-                {slides[currentSlide].description}
-              </p>
-            </motion.div>
-          </div>
-
-          <div className="absolute top-6 right-6 z-20 bg-white/10 backdrop-blur-md border border-white/20 text-white px-4 py-1 rounded-full text-sm">
-            {currentSlide + 1} / {slides.length}
-          </div>
-
-          {/* Navigation Arrows */}
-          <div className="absolute inset-y-0 left-4 right-4 flex items-center justify-between z-30 pointer-events-none">
-            <Button 
-              onClick={prevSlide}
-              className="pointer-events-auto w-12 h-12 rounded-full bg-black/20 hover:bg-black/50 backdrop-blur-sm border-0 text-white transition-all"
-            >
-              <ChevronLeftIcon className="h-6 w-6" />
-            </Button>
-            <Button
-              onClick={nextSlide}
-              className="pointer-events-auto w-12 h-12 rounded-full bg-black/20 hover:bg-black/50 backdrop-blur-sm border-0 text-white transition-all"
-            >
-              <ChevronRightIcon className="h-6 w-6" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Thumbnail & Progress Bar Section */}
-        <div className="mt-8 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex gap-3">
-            {slides.map((slide, index) => (
-              <button
-                key={slide.id}
-                onClick={() => goToSlide(index)}
-                className={`relative w-20 h-14 rounded-xl overflow-hidden transition-all duration-300 border-2 ${
-                  index === currentSlide ? "border-primary scale-110 shadow-lg" : "border-transparent opacity-40 hover:opacity-100"
-                }`}
-              >
-                <img src={slide.image} alt="" className="w-full h-full object-cover" />
-              </button>
-            ))}
-          </div>
-
-          <div className="flex-1 flex items-center gap-4 w-full max-w-2xl">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="rounded-full hover:bg-primary/10"
-            >
-              {isPlaying ? <PauseIcon className="h-5 w-5" /> : <PlayIcon className="h-5 w-5" />}
-            </Button>
-            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-primary transition-all duration-100 ease-linear" 
-                style={{ width: `${progress}%` }} 
-              />
-            </div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest min-w-[100px] text-right">
-              {slides[currentSlide].title}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 28 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, ease: "easeOut" },
+  },
 };
 
-// --- Home Component ---
-const Home = () => {
-  const [scrollY, setScrollY] = useState(0);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isShowingVideo, setIsShowingVideo] = useState(false);
+const fadeIn: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { duration: 0.8, ease: "easeOut" },
+  },
+};
 
-  const handleVideoPlay = () => {
-    setIsShowingVideo(true);
-    if (videoRef.current) videoRef.current.play();
-  };
+const slideLeft: Variants = {
+  hidden: { opacity: 0, x: -36 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.75, ease: "easeOut" },
+  },
+};
 
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+const slideRight: Variants = {
+  hidden: { opacity: 0, x: 36 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.8, ease: "easeOut" },
+  },
+};
 
-  const features = [
-    { icon: <Zap className="w-8 h-8" />, title: "Eco-Friendly", description: "Zero emissions, 100% electric power" },
-    { icon: <Battery className="w-8 h-8" />, title: "Long Range", description: "Up to 120km range with fast charging" },
-    { icon: <Gauge className="w-8 h-8" />, title: "High Performance", description: "Powerful motors up to 80 km/h" },
-    { icon: <Shield className="w-8 h-8" />, title: "Advanced Safety", description: "Smart braking and LED lighting" },
-  ];
+const staggerContainer: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.12,
+    },
+  },
+};
 
-  const stats = [
-    { icon: <Battery className="w-6 h-6" />, value: "120km", label: "Range" },
-    { icon: <Gauge className="w-6 h-6" />, value: "80 km/h", label: "Top Speed" },
-    { icon: <Shield className="w-6 h-6" />, value: "5 Years", label: "Warranty" },
-  ];
+/* -------------------------------------------------------
+   HOMEPAGE DATA
+------------------------------------------------------- */
 
+const models = [
+  {
+    name: "S1 Pro Gen 3",
+    brand: "OLA ELECTRIC",
+    image: olaGen3,
+    category: "Electric scooter",
+    tag: "FEATURED",
+  },
+  {
+    name: "S1 Pro",
+    brand: "OLA ELECTRIC",
+    image: olaS1Pro,
+    category: "Electric scooter",
+    tag: "PERFORMANCE",
+  },
+  {
+    name: "S1 Air",
+    brand: "OLA ELECTRIC",
+    image: olaS1Air,
+    category: "Electric scooter",
+    tag: "URBAN",
+  },
+];
+
+const discoveries = [
+  { name: "Everyday rides", image: roadstar, number: "01" },
+  { name: "Explore electric", image: pe1, number: "02" },
+  { name: "Made for the city", image: seeka, number: "03" },
+  { name: "Find your next ride", image: segun, number: "04" },
+];
+
+const benefits = [
+  {
+    icon: BatteryCharging,
+    title: "Electric efficiency",
+    text: "Explore battery-powered rides designed around your everyday journeys.",
+  },
+  {
+    icon: Gauge,
+    title: "Compare your options",
+    text: "Discover different models and explore the features that matter to you.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Choose with confidence",
+    text: "Review available model details before making your decision.",
+  },
+  {
+    icon: Leaf,
+    title: "A new way to move",
+    text: "Discover electric mobility and rethink your everyday commute.",
+  },
+];
+
+/* -------------------------------------------------------
+   REUSABLE SECTION HEADING
+------------------------------------------------------- */
+
+function SectionHeading({
+  eyebrow,
+  title,
+  description,
+  centered = false,
+}: {
+  eyebrow: string;
+  title: ReactNode;
+  description: string;
+  centered?: boolean;
+}) {
   return (
-    <div className="bg-background">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-hero" style={{ transform: `translateY(${scrollY * 0.3}px)` }} />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-20">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary font-bold text-sm mb-6 border border-primary/20">
+    <motion.div
+      variants={fadeUp}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.25 }}
+      className={`mb-12 max-w-2xl ${
+        centered ? "mx-auto text-center" : ""
+      }`}
+    >
+      <p className="text-xs font-bold uppercase tracking-[0.28em] text-blue-600 dark:text-blue-400">
+  {eyebrow}
+</p>
+
+<h2 className="mt-4 text-3xl font-black leading-tight tracking-[-0.04em] text-slate-900 dark:text-slate-900 dark:text-white sm:text-4xl lg:text-5xl">
+  {title}
+</h2>
+
+<p
+  className={`mt-5 text-sm leading-7 text-slate-600 dark:text-slate-600 dark:text-slate-400 sm:text-base ${
+    centered ? "mx-auto max-w-2xl" : "max-w-xl"
+  }`}
+>
+  {description}
+</p>
+    </motion.div>
+  );
+}
+
+/* -------------------------------------------------------
+   HOME PAGE
+------------------------------------------------------- */
+
+const Home = () => {
+  return (
+<main className="overflow-hidden bg-stone-50 text-slate-900 transition-colors duration-300 dark:bg-[#080E1D] dark:text-slate-100">      {/* HERO: cinematic dark styling retained in both themes */}
+      <section className="relative isolate min-h-[720px] overflow-hidden bg-[#080E1D] sm:min-h-[760px] lg:min-h-[820px]">
+        <motion.div
+          variants={fadeIn}
+          initial="hidden"
+          animate="visible"
+          className="absolute inset-0 -z-20"
+        >
+          <img
+            src={heroImage}
+            alt="Electric two-wheeler collection"
+            className="h-full w-full object-cover object-center"
+            fetchPriority="high"
+          />
+        </motion.div>
+
+        <div className="absolute inset-0 -z-10 bg-[#080E1D]/65" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#080E1D] via-[#080E1D]/90 to-[#080E1D]/30" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#080E1D] via-transparent to-[#080E1D]/45" />
+
+        <div className="pointer-events-none absolute -left-40 top-24 -z-10 h-96 w-96 rounded-full bg-blue-600/20 blur-[120px]" />
+        <div className="pointer-events-none absolute right-0 top-1/4 -z-10 h-80 w-80 rounded-full bg-sky-500/15 blur-[120px]" />
+
+        <div className="mx-auto flex min-h-[720px] max-w-[1440px] items-center px-5 pb-24 pt-28 sm:min-h-[760px] sm:px-10 lg:min-h-[820px] lg:px-16">
+          <div className="grid w-full items-center gap-16 lg:grid-cols-[1.05fr_0.95fr]">
+            {/* Hero copy */}
+            <motion.div
+              variants={slideLeft}
+              initial="hidden"
+              animate="visible"
+              className="relative z-10"
+            >
+              <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-blue-400/25 bg-blue-500/10 px-4 py-2.5 backdrop-blur-xl">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-70" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-400" />
                 </span>
-                The Future is Electric
+                <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-blue-200 sm:text-xs">
+                  The electric collection
+                </span>
               </div>
-              <h1 className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight tracking-tighter">
-                <span className="text-electric block">Pardeshi</span>
-                <span className="text-foreground">eBikes</span>
+
+              <h1 className="max-w-3xl text-5xl font-black leading-[0.98] tracking-[-0.065em] text-slate-900 dark:text-white sm:text-7xl lg:text-[88px]">
+                Find your
+                <br />
+                <span className="bg-gradient-to-r from-blue-300 via-sky-400 to-blue-500 bg-clip-text text-transparent">
+                  kind of
+                </span>
+                <br />
+                electric.
               </h1>
-              <p className="text-xl text-muted-foreground mb-10 max-w-lg leading-relaxed">
-                Experience the revolution of sustainable mobility with cutting-edge electric technology and unmatched style.
+
+              <p className="mt-8 max-w-lg text-base leading-8 text-slate-300 sm:text-lg">
+                Discover electric scooters and motorcycles from multiple
+                brands. Compare models, explore their features and find a ride
+                that fits your everyday life.
               </p>
-              <div className="flex flex-wrap gap-4 mb-12">
-                <Link to="/brands">
-                  <Button className="bg-gradient-primary text-lg px-10 py-6 rounded-2xl shadow-xl hover:shadow-primary/20">Explore Brands</Button>
-                </Link>
-                <Link to="/contact">
-                  <Button variant="outline" className="glass-hover text-lg px-10 py-6 rounded-2xl border-primary/20">Contact Us</Button>
-                </Link>
+
+              <div className="mt-10 flex flex-wrap gap-4">
+                <Button
+                  asChild
+                  className="group h-14 rounded-full border border-blue-400/40 bg-blue-600 px-7 text-sm font-bold text-slate-900 dark:text-white shadow-[0_0_35px_rgba(37,99,235,0.25)] transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500 hover:shadow-[0_0_45px_rgba(37,99,235,0.4)] sm:text-base"
+                >
+                  <Link to="/brands">
+                    Explore the collection
+                    <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </Link>
+                </Button>
+
+                <Button
+                  asChild
+                  variant="outline"
+                  className="h-14 rounded-full border-white/20 bg-white/[0.04] px-7 text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-blue-400/50 hover:bg-blue-500/10 hover:text-slate-900 dark:text-white sm:text-base"
+                >
+                  <a href="#featured">Discover the rides</a>
+                </Button>
               </div>
-              <div className="grid grid-cols-3 gap-8 p-6 bg-card/50 backdrop-blur-md rounded-3xl border border-white/5">
-                {stats.map((stat, index) => (
-                  <div key={index} className="text-center">
-                    <div className="flex justify-center mb-2 text-primary">{stat.icon}</div>
-                    <div className="text-2xl font-bold">{stat.value}</div>
-                    <div className="text-xs uppercase tracking-widest text-muted-foreground">{stat.label}</div>
-                  </div>
+
+              <div className="mt-12 flex flex-wrap gap-x-7 gap-y-4 border-t border-white/10 pt-6 text-xs text-slate-300 sm:text-sm">
+                {[
+                  "Multiple brands",
+                  "Scooter & motorcycle discovery",
+                  "Explore at your pace",
+                ].map((item) => (
+                  <span key={item} className="flex items-center gap-2">
+                    <Check className="h-4 w-4 shrink-0 text-blue-400" />
+                    {item}
+                  </span>
                 ))}
               </div>
             </motion.div>
-            
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1 }} className="relative">
-              <div className="absolute -inset-4 bg-primary/20 blur-3xl rounded-full opacity-30" />
-              <img src={Ola} alt="Pardeshi Electric Bike" className="relative w-full h-auto rounded-[2rem] shadow-glow z-10 object-cover" />
-              <div className="absolute top-6 right-6 bg-background/80 backdrop-blur-xl rounded-2xl p-5 border border-white/10 z-20 shadow-2xl">
-                <div className="text-xs uppercase font-bold text-muted-foreground mb-1">Starting from</div>
-                <div className="text-3xl font-black text-primary">₹89,999</div>
+
+            {/* Featured scooter */}
+            <motion.div
+              variants={slideRight}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.15 }}
+              className="relative mx-auto w-full max-w-xl"
+            >
+              <div className="pointer-events-none absolute inset-10 rounded-full bg-blue-500/25 blur-[100px]" />
+
+              <div className="relative overflow-hidden rounded-[2rem] border border-white/15 bg-[#101a30]/70 p-3 shadow-2xl shadow-black/40 backdrop-blur-2xl transition-colors duration-500 hover:border-blue-400/30">
+                <div className="relative overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-[#182743] via-[#111c32] to-[#0a1222]">
+                  <div className="absolute right-5 top-5 z-10 rounded-full border border-blue-300/20 bg-blue-500/10 px-3 py-1.5 text-[10px] font-bold tracking-[0.16em] text-blue-200 backdrop-blur-xl">
+                    EDITOR&apos;S PICK
+                  </div>
+
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.16),transparent_65%)]" />
+
+                  <motion.img
+                    src={olaGen3}
+                    alt="OLA S1 Pro Gen 3 electric scooter"
+                    className="relative h-[280px] w-full object-contain p-3 sm:h-[400px]"
+                    animate={{ y: [0, -8, 0] }}
+                    transition={{
+                      duration: 5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between gap-4 px-3 pb-3 pt-5 sm:px-4">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-blue-400">
+                      Featured model
+                    </p>
+                    <h2 className="mt-2 text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
+                      OLA S1 Pro Gen 3
+                    </h2>
+                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                      Explore the details
+                    </p>
+                  </div>
+
+                  <Link
+                    to="/brands"
+                    aria-label="Explore OLA electric scooters"
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-blue-400/30 bg-blue-600 text-slate-900 dark:text-white shadow-lg shadow-blue-950/40 transition-all duration-300 hover:scale-110 hover:bg-blue-500"
+                  >
+                    <ArrowDownRight className="h-6 w-6" />
+                  </Link>
+                </div>
               </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
+                className="absolute -bottom-5 -left-3 hidden rounded-2xl border border-white/10 bg-[#111b30]/90 px-5 py-4 shadow-xl backdrop-blur-xl sm:block"
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400">
+                  Your next ride
+                </p>
+                <p className="mt-1 font-semibold text-slate-900 dark:text-white">
+                  Starts with a discovery.
+                </p>
+              </motion.div>
             </motion.div>
           </div>
         </div>
+
+        <a
+          href="#featured"
+          className="absolute bottom-7 left-1/2 flex -translate-x-1/2 items-center gap-3 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.25em] text-slate-600 dark:text-slate-400 transition-colors hover:text-blue-300 sm:text-xs"
+        >
+          Scroll to explore
+          <ChevronRight className="h-4 w-4 rotate-90" />
+        </a>
       </section>
 
-      <Slideshow />
+      {/* THREE-STEP INTRO */}
+      <section className="border-y border-border bg-white dark:border-white/[0.06] dark:bg-white dark:bg-white dark:bg-[#0b1324]">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          className="mx-auto grid max-w-[1440px] gap-0 px-5 py-7 sm:grid-cols-3 sm:px-10 lg:px-16"
+        >
+          {[
+            ["01", "Discover", "Browse electric two-wheelers"],
+            ["02", "Compare", "Understand your options"],
+            ["03", "Choose", "Find your preferred ride"],
+          ].map(([number, title, description]) => (
+            <motion.div
+              key={number}
+              variants={fadeUp}
+              className="group flex items-center gap-4 border-b border-border py-5 last:border-0 dark:border-white/[0.06] sm:border-b-0 sm:border-r sm:px-6 sm:first:pl-0 sm:last:border-0 sm:last:pr-0"
+            >
+              <span className="text-sm font-bold tabular-nums text-blue-500 dark:text-blue-400">
+                {number}
+              </span>
+              <div>
+                <h3 className="font-bold text-foreground transition-colors group-hover:text-blue-600 dark:text-slate-900 dark:text-white dark:group-hover:text-blue-300">
+                  {title}
+                </h3>
+                <p className="mt-1 text-xs text-muted-foreground dark:text-slate-600 dark:text-slate-400 sm:text-sm">
+                  {description}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </section>
 
-      {/* JOY Section */}
-      <section className="py-24 bg-background overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">Experience <span className="text-electric">JOY e-Bikes</span></h2>
-          <p className="text-muted-foreground text-lg mb-16 max-w-2xl mx-auto">Adventure-ready, powerful, and designed for absolute freedom on the road.</p>
-          <div className="relative h-[400px] md:h-[600px] w-full flex justify-center items-center gap-4 md:gap-8">
-            <motion.img src="/images/joy1.jpg" alt="JOY Bike Left" className="w-1/3 aspect-[4/5] rounded-3xl shadow-xl object-cover" initial={{ x: -100, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} />
-            <motion.img src="/images/joy2.jpg" alt="JOY Bike Center" className="w-2/5 aspect-[4/5] rounded-[2.5rem] shadow-2xl object-cover z-20 border-4 border-background" initial={{ y: 50, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} viewport={{ once: true }} transition={{ duration: 1, delay: 0.2 }} />
-            <motion.img src="/images/joy3.jpg" alt="JOY Bike Right" className="w-1/3 aspect-[4/5] rounded-3xl shadow-xl object-cover" initial={{ x: 100, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} />
+      {/* FEATURED MODELS */}
+      <section
+        id="featured"
+        className="scroll-mt-24 bg-background py-20 transition-colors duration-300 dark:bg-[#080E1D] sm:py-28"
+      >
+        <div className="mx-auto max-w-[1440px] px-5 sm:px-10 lg:px-16">
+          <div className="mb-12 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+            <div>
+              <motion.p
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                className="text-xs font-bold uppercase tracking-[0.28em] text-blue-500 dark:text-blue-400"
+              >
+                The collection
+              </motion.p>
+
+              <motion.h2
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                className="mt-4 text-3xl font-black tracking-[-0.045em] text-foreground dark:text-slate-900 dark:text-white sm:text-5xl"
+              >
+                Find your next ride.
+              </motion.h2>
+
+              <motion.p
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                className="mt-4 max-w-xl text-sm leading-7 text-muted-foreground dark:text-slate-600 dark:text-slate-400 sm:text-base"
+              >
+                Start with these featured electric scooters, then explore the
+                wider collection.
+              </motion.p>
+            </div>
+
+            <Button
+              asChild
+              variant="outline"
+              className="group h-12 w-fit rounded-full border-border bg-background px-6 text-foreground transition-all duration-300 hover:border-blue-400/40 hover:bg-blue-500/10 hover:text-blue-700 dark:border-white/15 dark:bg-white/[0.03] dark:text-slate-900 dark:text-white dark:hover:text-slate-900 dark:text-white"
+            >
+              <Link to="/brands">
+                View all brands
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
           </div>
+
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.12 }}
+            className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+          >
+            {models.map((model) => (
+              <motion.article
+                key={model.name}
+                variants={fadeUp}
+                className="group overflow-hidden rounded-[1.75rem] border border-border bg-card transition-all duration-500 hover:-translate-y-2 hover:border-blue-400/40 hover:shadow-[0_22px_70px_rgba(0,0,0,0.12)] dark:border-white/[0.08] bg-white dark:bg-[#101a2d] dark:hover:border-blue-400/30 dark:hover:shadow-[0_22px_70px_rgba(0,0,0,0.28)]"
+              >
+                {/* Product image */}
+                <div className="relative flex h-[270px] items-center justify-center overflow-hidden bg-gradient-to-br from-[#1a2943] via-[#121f35] to-[#0c1526] p-5 sm:h-[290px]">
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.12),transparent_68%)] transition-opacity duration-500 group-hover:opacity-150" />
+
+                  <span className="absolute left-5 top-5 z-10 rounded-full border border-blue-300/20 bg-blue-500/10 px-3 py-1.5 text-[9px] font-bold tracking-[0.17em] text-blue-200 backdrop-blur-xl">
+                    {model.tag}
+                  </span>
+
+                  <motion.img
+                    src={model.image}
+                    alt={model.name}
+                    loading="lazy"
+                    className="relative h-full w-full object-contain transition-transform duration-700 ease-out group-hover:scale-110"
+                  />
+
+                  <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#101a2d]/50 to-transparent" />
+                </div>
+
+                {/* Product details */}
+                <div className="p-6 sm:p-7">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-[10px] font-bold tracking-[0.22em] text-blue-600 dark:text-blue-400">
+                      {model.brand}
+                    </p>
+                    <span className="rounded-full border border-border px-2.5 py-1 text-[10px] text-muted-foreground dark:border-white/[0.08] dark:text-slate-600 dark:text-slate-400">
+                      Electric
+                    </span>
+                  </div>
+
+                  <h3 className="mt-3 text-2xl font-bold tracking-tight text-foreground transition-colors group-hover:text-blue-700 dark:text-slate-900 dark:text-white dark:group-hover:text-blue-200">
+                    {model.name}
+                  </h3>
+
+                  <p className="mt-2 text-sm text-muted-foreground dark:text-slate-600 dark:text-slate-400">
+                    {model.category}
+                  </p>
+
+                  <Link
+                    to="/brands"
+                    className="mt-6 flex items-center justify-between border-t border-border pt-5 text-sm font-semibold text-foreground transition-colors hover:text-blue-700 dark:border-white/[0.08] dark:text-slate-300 dark:hover:text-blue-300"
+                  >
+                    Explore model
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full border border-border transition-all duration-300 group-hover:border-blue-400/30 group-hover:bg-blue-500/10 dark:border-white/10">
+                      <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                    </span>
+                  </Link>
+                </div>
+              </motion.article>
+            ))}
+          </motion.div>
+
+          <p className="mt-6 text-xs leading-6 text-muted-foreground dark:text-slate-500">
+            Product availability, specifications and prices should be confirmed
+            against the final showroom dataset.
+          </p>
         </div>
       </section>
 
-      {/* OLA Section */}
-      <section className="py-24 bg-card/30">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-2">Explore <span className="text-primary">OLA Electric</span></h2>
-          <p className="text-muted-foreground mb-16">Smart. Stylish. Built for the future of urban mobility.</p>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
-            {["ola1.jpg", "ola2.jpg", "ola3.jpg"].map((img, i) => (
-              <motion.div key={i} whileHover={{ y: -10 }} className="group relative rounded-[2rem] overflow-hidden shadow-xl aspect-square">
-                <img src={`/images/${img}`} alt={`OLA ${i}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
-                  <Button className="w-full bg-white text-black hover:bg-white/90">View Details</Button>
-                </div>
+      {/* DISCOVER MORE */}
+      <section className="relative overflow-hidden border-y border-border bg-muted/40 py-20 transition-colors duration-300 dark:border-white/[0.06] dark:bg-[#0b1324] sm:py-28">
+        <div className="pointer-events-none absolute -right-40 top-10 h-96 w-96 rounded-full bg-blue-600/10 blur-[120px]" />
+
+        <div className="relative mx-auto max-w-[1440px] px-5 sm:px-10 lg:px-16">
+          <SectionHeading
+            eyebrow="More to explore"
+            title={
+              <>
+                Different rides.
+                <br />
+                <span className="text-blue-600 dark:text-blue-400">
+                  One destination.
+                </span>
+              </>
+            }
+            description="Explore the collection and discover electric two-wheelers for different lifestyles, journeys and everyday needs."
+          />
+
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4"
+          >
+            {discoveries.map((item) => (
+              <motion.div
+                key={item.number}
+                variants={fadeUp}
+                className="group"
+              >
+                <Link to="/brands" className="block">
+                  <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-border bg-card sm:rounded-3xl dark:border-white/10 dark:bg-[#111b30]">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                    />
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#060b16] via-[#060b16]/15 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-100" />
+
+                    <div className="absolute inset-0 bg-blue-600/0 transition-colors duration-500 group-hover:bg-blue-600/10" />
+
+                    <span className="absolute left-3 top-3 text-[10px] font-bold tracking-[0.2em] text-blue-300 sm:left-5 sm:top-5 sm:text-xs">
+                      {item.number}
+                    </span>
+
+                    <div className="absolute inset-x-3 bottom-4 sm:inset-x-5 sm:bottom-5">
+                      <h3 className="text-sm font-bold leading-snug text-slate-900 dark:text-white sm:text-xl">
+                        {item.name}
+                      </h3>
+
+                      <span className="mt-3 inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-slate-300 transition-colors group-hover:text-blue-300 sm:text-xs">
+                        Explore
+                        <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Video Section */}
-      <section className="py-24 bg-background">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-4">See Pardeshi <span className="text-electric">In Action</span></h2>
-          <p className="text-muted-foreground mb-12">Experience the power, elegance, and innovation of our electric bikes</p>
-          <div className="group relative aspect-video bg-muted rounded-[2.5rem] overflow-hidden shadow-2xl">
-            <AnimatePresence>
-              {!isShowingVideo && (
-                <motion.div exit={{ opacity: 0 }} className="absolute inset-0 z-20 flex items-center justify-center">
-                  <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
-                  <Button onClick={handleVideoPlay} className="relative z-30 h-24 w-24 rounded-full bg-primary text-white shadow-glow animate-pulse">
-                    <Play className="fill-current w-8 h-8 ml-1" />
-                  </Button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            <video ref={videoRef} className="w-full h-full object-cover" poster={Ola} controls={isShowingVideo}>
+      {/* VIDEO SHOWCASE */}
+      <section
+        id="video-showcase"
+        className="bg-background py-20 transition-colors duration-300 dark:bg-[#080E1D] sm:py-28"
+      >
+        <div className="mx-auto max-w-[1440px] px-5 sm:px-10 lg:px-16">
+          <SectionHeading
+            centered
+            eyebrow="Experience the difference"
+            title={
+              <>
+                See Pardeshi{" "}
+                <span className="text-blue-600 dark:text-blue-400">
+                  in action.
+                </span>
+              </>
+            }
+            description="Discover the design, style and experience of electric mobility through our video showcase."
+          />
+
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            className="group relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl shadow-black/10 transition-all duration-500 hover:border-blue-400/40 dark:border-white/10 bg-white dark:bg-[#101a2d] dark:shadow-black/30 dark:hover:border-blue-400/25 sm:rounded-[2rem]"
+          >
+            <div className="pointer-events-none absolute inset-0 z-10 border border-inset border-blue-400/0 transition-colors duration-500 group-hover:border-blue-400/10" />
+
+            <video
+              className="aspect-video h-auto max-h-[720px] w-full object-contain"
+              controls
+              preload="metadata"
+              playsInline
+              poster={heroImage}
+            >
               <source src={heroVideo} type="video/mp4" />
+              Your browser does not support HTML video.
             </video>
+          </motion.div>
+
+          <div className="mx-auto mt-6 flex max-w-6xl flex-col gap-4 text-sm text-muted-foreground dark:text-slate-600 dark:text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+            <p>Discover electric mobility, your way.</p>
+
+            <Link
+              to="/brands"
+              className="group inline-flex items-center gap-2 font-semibold text-foreground transition-colors hover:text-blue-700 dark:text-slate-200 dark:hover:text-blue-300"
+            >
+              Explore the collection
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-24 bg-background border-y border-white/5">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-4">Why Choose Pardeshi eBikes?</h2>
-          <p className="text-muted-foreground mb-16 max-w-2xl mx-auto">Leading the electric revolution with innovative technology and sustainable design.</p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12">
-            {features.map((feature, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
-                <div className="w-16 h-16 bg-primary/10 rounded-2xl text-primary mb-6 flex items-center justify-center mx-auto border border-primary/20">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
+      {/* BENEFITS */}
+      <section className="border-t border-border bg-muted/40 py-20 transition-colors duration-300 dark:border-white/[0.06] dark:bg-white dark:bg-[#0b1324] sm:py-28">
+        <div className="mx-auto max-w-[1440px] px-5 sm:px-10 lg:px-16">
+          <SectionHeading
+            centered
+            eyebrow="The Pardeshi experience"
+            title={
+              <>
+                Better ways to{" "}
+                <span className="text-blue-600 dark:text-blue-400">
+                  explore.
+                </span>
+              </>
+            }
+            description="A thoughtfully designed showroom to help you discover electric mobility and explore your options with confidence."
+          />
+
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          >
+            {benefits.map((benefit) => {
+              const Icon = benefit.icon;
+
+              return (
+                <motion.article
+                  key={benefit.title}
+                  variants={fadeUp}
+                  className="group rounded-3xl border border-border bg-card p-6 transition-all duration-500 hover:-translate-y-1 hover:border-blue-400/40 hover:bg-blue-50/70 dark:border-white/[0.08] dark:bg-[#111b30] dark:hover:border-blue-400/25 dark:hover:bg-[#14213a] sm:p-7"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10 text-blue-600 transition-all duration-300 group-hover:border-blue-400/40 group-hover:bg-blue-500/20 group-hover:text-blue-700 dark:text-blue-400 dark:group-hover:text-blue-300">
+                    <Icon className="h-6 w-6" />
+                  </div>
+
+                  <h3 className="mt-6 text-lg font-bold text-foreground dark:text-slate-900 dark:text-white">
+                    {benefit.title}
+                  </h3>
+
+                  <p className="mt-3 text-sm leading-7 text-muted-foreground dark:text-slate-600 dark:text-slate-400">
+                    {benefit.text}
+                  </p>
+                </motion.article>
+              );
+            })}
+          </motion.div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-32 bg-background relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 blur-[120px] rounded-full" />
-        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-          <h2 className="text-5xl md:text-6xl font-black mb-8 tracking-tighter">Ready to Go Electric?</h2>
-          <p className="text-xl text-muted-foreground mb-12">Join the sustainable transportation revolution today and ride into a cleaner tomorrow.</p>
-          <Link to="/brands">
-            <Button className="bg-gradient-primary text-xl px-16 py-8 rounded-[2rem] shadow-glow transform hover:scale-105 transition-all">Shop Now</Button>
+      {/* FINAL CALL TO ACTION */}
+      <section className="bg-background px-5 py-20 transition-colors duration-300 dark:bg-[#080E1D] sm:px-10 sm:py-28 lg:px-16">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          className="relative mx-auto max-w-[1440px] overflow-hidden rounded-[2rem] border border-blue-400/20 bg-gradient-to-br from-[#142b50] via-[#10203c] to-[#0c1629] px-6 py-12 shadow-2xl shadow-black/20 sm:px-12 sm:py-16 lg:px-20 lg:py-20"
+        >
+          <div className="pointer-events-none absolute -right-20 -top-32 h-96 w-96 rounded-full bg-blue-500/20 blur-[100px]" />
+          <div className="pointer-events-none absolute -bottom-40 left-1/4 h-80 w-80 rounded-full bg-sky-500/10 blur-[100px]" />
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,transparent_35%,rgba(96,165,250,0.06)_50%,transparent_65%)]" />
+
+          <div className="relative z-10 flex flex-col justify-between gap-9 md:flex-row md:items-center">
+            <div className="max-w-2xl">
+              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-blue-300 sm:text-xs">
+                Your journey starts here
+              </p>
+
+              <h2 className="mt-5 text-3xl font-black leading-tight tracking-[-0.045em] text-slate-900 dark:text-white sm:text-5xl lg:text-6xl">
+                Ready to go
+                <br className="hidden sm:block" />{" "}
+                <span className="text-blue-400">electric?</span>
+              </h2>
+
+              <p className="mt-5 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">
+                Explore brands, discover models and take the first step
+                towards finding your next ride.
+              </p>
+            </div>
+
+            <Button
+              asChild
+              className="group h-14 shrink-0 rounded-full border border-blue-400/40 bg-blue-600 px-7 text-sm font-bold text-slate-900 dark:text-white shadow-lg shadow-blue-950/30 transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500 hover:shadow-blue-900/40 sm:text-base"
+            >
+              <Link to="/brands">
+                Explore all brands
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+              </Link>
+            </Button>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t border-border bg-card transition-colors duration-300 dark:border-white/[0.08] dark:bg-[#070C18]">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-5 px-5 py-8 sm:px-10 md:flex-row md:items-center md:justify-between lg:px-16">
+          <Link
+            to="/"
+            className="w-fit text-lg font-black tracking-tight text-foreground transition-opacity hover:opacity-80 dark:text-slate-900 dark:text-white"
+          >
+            PARDESHI{" "}
+            <span className="text-blue-600 dark:text-blue-400">eBIKE.</span>
           </Link>
+
+          <p className="text-sm text-muted-foreground dark:text-slate-500">
+            Discover electric mobility, your way.
+          </p>
+
+          <nav aria-label="Footer navigation" className="flex gap-6 text-sm">
+            <Link
+              to="/brands"
+              className="text-muted-foreground transition-colors hover:text-blue-700 dark:text-slate-600 dark:text-slate-400 dark:hover:text-blue-300"
+            >
+              Brands
+            </Link>
+
+            <Link
+              to="/contact"
+              className="text-muted-foreground transition-colors hover:text-blue-700 dark:text-slate-600 dark:text-slate-400 dark:hover:text-blue-300"
+            >
+              Contact
+            </Link>
+          </nav>
         </div>
-      </section>
-    </div>
+
+        <div className="border-t border-border px-5 py-4 text-center text-[11px] text-muted-foreground dark:border-white/[0.05] dark:text-slate-600">
+          PARDESHI eBIKE · Discover electric mobility
+        </div>
+      </footer>
+    </main>
   );
 };
 
